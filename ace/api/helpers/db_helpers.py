@@ -1,4 +1,4 @@
-from database.database import get_db_connection
+from database import get_db_connection
 
 def get_past_messages(team_id, persona_id):
     db = get_db_connection()

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ace.database.database import Supabase_singleton
+from database import Supabase_singleton
 from openai_client import query_openai
 
 chat_bp = Blueprint("chat", __name__)

@@ -1,4 +1,4 @@
-from database.database import get_db_connection
+from database import get_db_connection
 
 def get_persona_by_name(persona_name):
     db = get_db_connection()

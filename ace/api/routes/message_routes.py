@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
-from backend.helpers.user_helpers import get_team_session
+from helpers.user_helpers import get_team_session
 from helpers.persona_helpers import get_persona_by_name, get_requirement_doc
 from helpers.db_helpers import get_past_messages, insert_message
 from helpers.chat_helpers import build_chat_messages, call_openai_chat

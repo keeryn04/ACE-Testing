@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import uuid
-from database.database import get_db_connection
+from database import get_db_connection
 
 MAX_MEMBERS = 4
 
