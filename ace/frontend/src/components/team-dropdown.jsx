@@ -2,31 +2,44 @@ import React, { useEffect, useState } from "react";
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function TeamDropdown() {
-  const [userTeam, setUserTeam] = useState(null);
+  const [userTeam, setUserTeam] = useState<{ name: String } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserAndTeams = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return setLoading(false);
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      //decode token
+      // Decode token
       const res = await fetch(`${API_BASE}/api/decode_token`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        setUserTeam(null);
+        return;
+      }
 
       const decoded = await res.json();
       const currentUserId = decoded.current_user;
 
-      //fetch user's team
+      // Fetch user's team
       const userRes = await fetch(`${API_BASE}/api/team/${currentUserId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!userRes.ok) {
+        setUserTeam(null);
+        return;
+      }
+
       const userData = await userRes.json();
-      setUserTeam(userData.team || null);
+      setUserTeam(userData?.team || null);
     } catch (err) {
       console.error(err);
+      setUserTeam(null);
     } finally {
       setLoading(false);
     }
@@ -41,7 +54,7 @@ export default function TeamDropdown() {
   return (
     <div>
       <label className="block mb-2 font-bold">Your Team</label>
-      {userTeam && userTeam.name ? (
+      {userTeam?.name ? (
         <p>{userTeam.name}</p>
       ) : (
         <p className="text-gray-500">Please login to see team info</p>
