@@ -76,7 +76,7 @@ export default function ChatPage() {
     const token = localStorage.getItem("token");
     if (!token) return null;
     try {
-      const res = await fetch(`/api/decode_token`, {
+      const res = await fetch(`${API_BASE}/api/decode_token`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return null;
@@ -108,7 +108,7 @@ export default function ChatPage() {
     setDownloading(true);
     const name = currentPersonaName;
     try {
-      const url = `/api/export/conversations/${encodeURIComponent(teamId)}/${encodeURIComponent(name)}.pdf`;
+      const url = `${API_BASE}/api/export/conversations/${encodeURIComponent(teamId)}/${encodeURIComponent(name)}.pdf`;
 
       const res = await fetch(url, {
         method: "GET",
@@ -143,7 +143,7 @@ export default function ChatPage() {
     useEffect(() => {
       (async () => {
         try {
-          const res = await fetch(`/api/personas`);
+          const res = await fetch(`${API_BASE}/api/personas`);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
           const formatted = data.map((p) => ({ id: p.persona_id, name: p.persona_name }));
@@ -167,7 +167,7 @@ export default function ChatPage() {
         setErr("");
 
         const res = await fetch(
-          `/api/past_messages` +
+          `${API_BASE}/api/past_messages` +
           `?team_id=${encodeURIComponent(teamId)}` +
           `&persona_name=${encodeURIComponent(name)}`
         );
@@ -226,7 +226,7 @@ export default function ChatPage() {
         user_id: userId
       };
 
-      const res = await fetch(`/api/send_message`, {
+      const res = await fetch(`${API_BASE}/api/send_message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

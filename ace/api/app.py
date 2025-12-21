@@ -13,7 +13,7 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-CORS(app, origins=["https://ace-testing-frontend.onrender.com"], supports_credentials=True)
+CORS(app, origins=["https://ace-testing.onrender.com"], supports_credentials=True)
 
 app.register_blueprint(personas_bp)
 app.register_blueprint(messages_bp)
