@@ -52,7 +52,7 @@ export default function ChatPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`/api/personas`);
+        const res = await fetch(`${API_BASE}/api/personas`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const formatted = data.map((p) => ({ id: p.persona_id, name: p.persona_name }));
