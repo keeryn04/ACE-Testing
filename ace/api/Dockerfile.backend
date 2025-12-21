@@ -6,16 +6,18 @@ WORKDIR /app
 COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy code
+# Copy all backend code
 COPY . .
 
-# Set production Flask env
+# Set production Flask environment
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 
-# Install gunicorn
+# Install Gunicorn
 RUN pip install gunicorn
 
-# Expose port and start
-EXPOSE $PORT
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:$PORT", "app:app"]
+# Expose default port for clarity
+EXPOSE 5001
+
+# Start Gunicorn with dynamic Render port
+CMD gunicorn -w 4 -b 0.0.0.0:$PORT app:app
