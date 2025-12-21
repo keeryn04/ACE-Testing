@@ -12,7 +12,7 @@ export default function TeamDropdown() {
 
     try {
       //decode token
-      const res = await fetch(`${API_BASE}/api/decode_token`, {
+      const res = await fetch(`/api/decode_token`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return null;
@@ -21,7 +21,7 @@ export default function TeamDropdown() {
       const currentUserId = decoded.current_user;
 
       //fetch user's team
-      const userRes = await fetch(`${API_BASE}/api/team/${currentUserId}`, {
+      const userRes = await fetch(`/api/team/${currentUserId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const userData = await userRes.json();

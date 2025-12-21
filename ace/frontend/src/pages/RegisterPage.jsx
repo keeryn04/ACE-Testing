@@ -30,7 +30,7 @@ const RegisterPage = () => {
         }
 
         try {
-            const res = await fetch(`${API_BASE}/api/register_user`, {
+            const res = await fetch(`/api/register_user`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, email, password, ucid }),
