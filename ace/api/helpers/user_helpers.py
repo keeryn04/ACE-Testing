@@ -8,13 +8,13 @@ def register_new_user(name, email, password, ucid):
     db = get_db_connection()
 
     # Check if user exists
-    response = db.table("users").select("email, ucid").or_(f"ucid.eq.{ucid},email.eq.{email}").limit(1).execute()
+    response = db.table("user").select("email, ucid").or_(f"ucid.eq.{ucid},email.eq.{email}").limit(1).execute()
     if response.data:
         return False, "user_exists", None
 
     # Insert new user
     new_user_id = str(uuid.uuid4())
-    response = db.table("users").insert({
+    response = db.table("user").insert({
         "user_id": new_user_id,
         "name": name,
         "email": email,
@@ -30,19 +30,19 @@ def register_new_user(name, email, password, ucid):
 
 def get_all_users():
     db = get_db_connection()
-    response = db.table("users").select("*").execute()
+    response = db.table("user").select("*").execute()
     return response.data or []
 
 
 def get_user_by_id(user_id):
     db = get_db_connection()
-    response = db.table("users").select("*").eq("user_id", user_id).limit(1).execute()
+    response = db.table("user").select("*").eq("user_id", user_id).limit(1).execute()
     return response.data[0] if response.data else None
 
 
 def get_user_by_email(email):
     db = get_db_connection()
-    response = db.table("users").select("*").eq("email", email).limit(1).execute()
+    response = db.table("user").select("*").eq("email", email).limit(1).execute()
     return response.data[0] if response.data else None
 
 
@@ -70,7 +70,7 @@ def get_teams_with_members():
     teams = teams_response.data or []
 
     for team in teams:
-        members_response = db.table("users").select("user_id, name").eq("team_id", team["team_id"]).execute()
+        members_response = db.table("user").select("user_id, name").eq("team_id", team["team_id"]).execute()
         team["members"] = members_response.data or []
 
     return teams
@@ -86,17 +86,17 @@ def add_user_to_team(user_id, team_id):
     db = get_db_connection()
 
     # Check if user is already in a team
-    user_resp = db.table("users").select("team_id").eq("user_id", user_id).limit(1).execute()
+    user_resp = db.table("user").select("team_id").eq("user_id", user_id).limit(1).execute()
     if user_resp.data and user_resp.data[0].get("team_id"):
         return False, "User already in a team"
 
     # Check if team is full
-    count_resp = db.table("users").select("user_id", count="exact").eq("team_id", team_id).execute()
+    count_resp = db.table("user").select("user_id", count="exact").eq("team_id", team_id).execute()
     if count_resp.count >= MAX_MEMBERS:
         return False, "Team is full"
 
     # Assign user to team
-    response = db.table("users").update({"team_id": team_id}).eq("user_id", user_id).execute()
+    response = db.table("user").update({"team_id": team_id}).eq("user_id", user_id).execute()
     if response.data:
         return True, None
     return False, "update_failed"
