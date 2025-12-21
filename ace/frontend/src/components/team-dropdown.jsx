@@ -41,7 +41,11 @@ export default function TeamDropdown() {
   return (
     <div>
       <label className="block mb-2 font-bold">Your Team</label>
-      <p>{userTeam.name}</p>
+      {userTeam && userTeam.name ? (
+        <p>{userTeam.name}</p>
+      ) : (
+        <p className="text-gray-500">Please login to see team info</p>
+      )}
     </div>
   );
 }
