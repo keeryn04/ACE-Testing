@@ -1,0 +1,11 @@
+FROM node:20-alpine
+
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci
+
+# We’ll mount the rest of the source in compose for hot reload
+EXPOSE 5173
+
+# Ensure Vite binds to 0.0.0.0 so your browser can hit it
+CMD ["npm", "run", "dev", "--", "--host"]

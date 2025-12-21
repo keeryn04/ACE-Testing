@@ -1,0 +1,32 @@
+FROM python:3.11-slim
+
+# System deps (keep minimal)
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+  && rm -rf /var/lib/apt/lists/*
+
+# Set working directory to the project root
+WORKDIR /app
+
+# Copy backend requirements only
+COPY backend/requirements.txt /app/backend/requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r backend/requirements.txt
+
+# Make database and helpers packages (optional but safe)
+COPY database /app/database
+COPY backend/helpers /app/helpers
+
+# Copy backend code
+COPY backend /app/backend
+
+# Flask runtime config
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+ENV PYTHONPATH=/app
+
+EXPOSE 5001
+
+# Start backend on port 5001
+CMD ["flask", "--app", "backend.app", "run", "--host", "0.0.0.0", "-p", "5001", "--debug"]
