@@ -60,13 +60,13 @@ def get_team_session(team_id):
 
 def get_teams():
     db = get_db_connection()
-    response = db.table("teams").select("*").execute()
+    response = db.table("team").select("*").execute()
     return response.data or []
 
 
 def get_teams_with_members():
     db = get_db_connection()
-    teams_response = db.table("teams").select("team_id, name, created_at").execute()
+    teams_response = db.table("team").select("team_id, name, created_at").execute()
     teams = teams_response.data or []
 
     for team in teams:
@@ -78,7 +78,7 @@ def get_teams_with_members():
 
 def get_team(team_id):
     db = get_db_connection()
-    response = db.table("teams").select("*").eq("team_id", team_id).limit(1).execute()
+    response = db.table("team").select("*").eq("team_id", team_id).limit(1).execute()
     return response.data[0] if response.data else None
 
 
