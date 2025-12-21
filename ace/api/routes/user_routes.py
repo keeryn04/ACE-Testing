@@ -93,7 +93,7 @@ def login():
         
         team_id = user.get("team_id")
         now = datetime.utcnow()
-        exp_time = int(time.mktime((now + timedelta(hours=1)).timetuple()))
+        exp_time = int((now + timedelta(hours=1)).timestamp())
         can_send_messages = True
         
         if team_id:
