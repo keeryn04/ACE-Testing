@@ -1,11 +1,17 @@
+# Use Node 20
 FROM node:20-alpine
 
+# Set working directory
 WORKDIR /app
-COPY frontend/package*.json ./
+
+# Copy package.json and package-lock.json (inside frontend context)
+COPY package*.json ./
+
+# Install dependencies
 RUN npm ci
 
-# We’ll mount the rest of the source in compose for hot reload
+# Expose Vite port
 EXPOSE 5173
 
-# Ensure Vite binds to 0.0.0.0 so your browser can hit it
+# Start dev server on all interfaces (host 0.0.0.0)
 CMD ["npm", "run", "dev", "--", "--host"]
