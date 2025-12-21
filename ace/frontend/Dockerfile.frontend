@@ -1,17 +1,19 @@
-# Use Node 20
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json (inside frontend context)
+# Copy package.json + lock
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci
 
-# Expose Vite port
-EXPOSE 5173
+# Copy source code
+COPY . .
 
-# Start dev server on all interfaces (host 0.0.0.0)
-CMD ["npm", "run", "dev", "--", "--host"]
+# Build Vite frontend
+RUN npm run build
+
+# Install static file server
+RUN npm install -g serve
+
+EXPOSE 3000
+CMD ["serve", "-s", "dist", "-l", "3000"]
