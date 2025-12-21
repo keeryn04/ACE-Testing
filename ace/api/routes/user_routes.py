@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from flask import Blueprint, request, jsonify
 import jwt
 from helpers.user_helpers import add_user_to_team, check_user_password, get_team, get_team_session, get_teams, get_teams_with_members, get_user_by_email, get_user_by_id, register_new_user, get_all_users, upsert_team_session
@@ -93,6 +93,7 @@ def login():
         
         team_id = user.get("team_id")
         now = datetime.utcnow()
+        exp_time = int(time.mktime((now + timedelta(hours=1)).timetuple()))
         can_send_messages = True
         
         if team_id:
@@ -103,7 +104,7 @@ def login():
             token = jwt.encode({
                 "current_user": user.get("user_id"),
                 "team_id": team_id,
-                "exp": now + timedelta(hours=1)
+                "exp": exp_time
             }, SECRET)
 
             if session:
@@ -130,7 +131,7 @@ def login():
             token = jwt.encode({
                 "current_user": user.get("user_id"),
                 "team_id": None,
-                "exp": now + timedelta(hours=1)
+                "exp": exp_time
             }, SECRET)
 
             return jsonify({
