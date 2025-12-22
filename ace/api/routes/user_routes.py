@@ -41,7 +41,12 @@ def register_user():
         if team_id:
             #user on team, track 1-hour session
             session = get_team_session(team_id)
-            if session and now - session["login_time"] < timedelta(hours=1):
+            session_login_time = session["login_time"]
+
+            if isinstance(session_login_time, str):
+                    session_login_time = datetime.fromisoformat(session_login_time)
+
+            if session and now - session_login_time < timedelta(hours=1):
                 return jsonify({"error": "Another team member is logged in"}), 403
 
             token = jwt.encode({
@@ -112,6 +117,9 @@ def login():
 
             if session:
                 session_login_time = session["login_time"]
+
+                if isinstance(session_login_time, str):
+                    session_login_time = datetime.fromisoformat(session_login_time)
 
                 if now - session_login_time < timedelta(hours=1):
                     #Session is still valid
