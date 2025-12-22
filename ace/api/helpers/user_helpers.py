@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import uuid
 import bcrypt
 from database import get_db_connection
-from helpers.user_helpers import hash_password
 
 MAX_MEMBERS = 5
 
