@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../index.css"
 import TeamDropdown from "./team-dropdown";
+import { useNavigate } from "react-router-dom";
+
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 const HeaderTeal = () => {
+  const navigate = useNavigate();
   const [showTeamDropdown, setShowTeamDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -29,6 +32,25 @@ const HeaderTeal = () => {
     };
   }, []);
 
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      if (token) {
+        await fetch(`${API_BASE}/api/logout`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      localStorage.clear();
+      navigate("/");
+    }
+  };
+
   return (
     <div className="sticky w-screen left-0 top-0 h-20 bg-darkteal rounded-b-xl border-1 shadow-md z-50">
       <div className="flex justify-between w-full h-full">
@@ -37,7 +59,7 @@ const HeaderTeal = () => {
           <p className="text-sm pl-10">AI Client for Engineering</p>
         </div>
         <div className="flex flex-1 justify-end pr-10 items-center gap-2">
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button onClick={handleProfileClick}>Profile</button>
             {showTeamDropdown && (
               <div className="absolute right-0 mt-2 z-50">
@@ -45,6 +67,9 @@ const HeaderTeal = () => {
               </div>
             )}
           </div>
+          <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded">
+            Logout
+          </button>
           <button>Tutorial</button>
         </div>
       </div>

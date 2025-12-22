@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from datetime import datetime, time, timedelta
 from flask import Blueprint, request, jsonify
 import jwt
-from helpers.user_helpers import add_user_to_team, check_user_password, get_team, get_team_session, get_teams, get_teams_with_members, get_user_by_email, get_user_by_id, register_new_user, get_all_users, upsert_team_session
+from helpers.user_helpers import add_user_to_team, check_user_password, get_team, get_team_session, get_teams_with_members, get_user_by_email, get_user_by_id, register_new_user, get_all_users, upsert_team_session, delete_team_session
 
 load_dotenv()
 SECRET = os.getenv("JWT_ACCESS_KEY")
@@ -156,6 +156,30 @@ def login():
     except Exception as e:
         print("Login error:", e)
         return jsonify({"error": "Unexpected server error"}), 500
+    
+# ------------------------------------------------------------
+# POST /api/logout
+# ------------------------------------------------------------
+@user_bp.post("/api/logout")
+def logout():
+    try:
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Missing token"}), 401
+
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET, algorithms=["HS256"])
+        user_id = payload.get("current_user")
+        team_id = payload.get("team_id")
+
+        #Clear team session if user is part of a team
+        if team_id:
+            delete_team_session(team_id)
+
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print("Logout error:", e)
+        return jsonify({"error": "Failed to logout"}), 500
 
 # ------------------------------------------------------------
 # GET /api/get_users
@@ -205,9 +229,14 @@ def join_team(team_id):
 
         if not current_user_id:
             return jsonify({"error": "Invalid token"}), 401
+        
+        data = request.get_json() or {}
+        team_password = data.get("team_password")
+        if not team_password:
+            return jsonify({"error": "Team password required"}), 400
 
         #assign user to team
-        success, error = add_user_to_team(current_user_id, team_id)
+        success, error = add_user_to_team(current_user_id, team_id, team_password)
         if not success:
             return jsonify({"error": error}), 403
 

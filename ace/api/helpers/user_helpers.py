@@ -1,24 +1,28 @@
 from datetime import datetime, timedelta
 import uuid
+import bcrypt
 from database import get_db_connection
+from helpers.user_helpers import hash_password
 
-MAX_MEMBERS = 4
+MAX_MEMBERS = 5
 
 def register_new_user(name, email, password, ucid):
     db = get_db_connection()
 
-    # Check if user exists
+    #Check if user exists
     response = db.table("user").select("email, ucid").or_(f"ucid.eq.{ucid},email.eq.{email}").limit(1).execute()
     if response.data:
         return False, "user_exists", None
+    
+    password_hash = hash_password(password)
 
-    # Insert new user
+    #Insert new user
     new_user_id = str(uuid.uuid4())
     response = db.table("user").insert({
         "user_id": new_user_id,
         "name": name,
         "email": email,
-        "password": password,  # hashed if you want
+        "password": password_hash,
         "ucid": ucid,
         "is_prof": False
     }).execute()
@@ -27,42 +31,40 @@ def register_new_user(name, email, password, ucid):
         return True, None, new_user_id
     return False, "insert_failed", None
 
-
 def get_all_users():
     db = get_db_connection()
     response = db.table("user").select("*").execute()
     return response.data or []
-
 
 def get_user_by_id(user_id):
     db = get_db_connection()
     response = db.table("user").select("*").eq("user_id", user_id).limit(1).execute()
     return response.data[0] if response.data else None
 
-
 def get_user_by_email(email):
     db = get_db_connection()
     response = db.table("user").select("*").eq("email", email).limit(1).execute()
     return response.data[0] if response.data else None
 
+def hash_password(plain_password: str) -> str:
+    hashed = bcrypt.hashpw(plain_password.encode('utf-8'), bcrypt.gensalt())
+    return hashed.decode('utf-8')
 
-def check_user_password(password, user):
-    if not user:
+def check_user_password(plain_password: str, user: dict) -> bool:
+    hashed = user.get("password")
+    if not hashed:
         return False
-    return user.get("password") == password
-
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed.encode('utf-8'))
 
 def get_team_session(team_id):
     db = get_db_connection()
     response = db.table("team_sessions").select("*").eq("team_id", team_id).limit(1).execute()
     return response.data[0] if response.data else None
 
-
 def get_teams():
     db = get_db_connection()
     response = db.table("team").select("*").execute()
     return response.data or []
-
 
 def get_teams_with_members():
     db = get_db_connection()
@@ -75,14 +77,12 @@ def get_teams_with_members():
 
     return teams
 
-
 def get_team(team_id):
     db = get_db_connection()
     response = db.table("team").select("*").eq("team_id", team_id).limit(1).execute()
     return response.data[0] if response.data else None
 
-
-def add_user_to_team(user_id, team_id):
+def add_user_to_team(user_id, team_id, team_password):
     db = get_db_connection()
 
     # Check if user is already in a team
@@ -94,13 +94,20 @@ def add_user_to_team(user_id, team_id):
     count_resp = db.table("user").select("user_id", count="exact").eq("team_id", team_id).execute()
     if count_resp.count >= MAX_MEMBERS:
         return False, "Team is full"
+    
+    team_resp = db.table("team").select("team_password").eq("team_id", team_id).limit(1).execute()
+    if not team_resp.data:
+        return False, "Team not found"
+    stored_password = team_resp.data[0]["team_password"]
+
+    if team_password != stored_password:
+        return False, "Incorrect team password"
 
     # Assign user to team
     response = db.table("user").update({"team_id": team_id}).eq("user_id", user_id).execute()
     if response.data:
         return True, None
     return False, "update_failed"
-
 
 def upsert_team_session(team_id, user_id, jwt_token, login_time):
     db = get_db_connection()
@@ -120,8 +127,7 @@ def upsert_team_session(team_id, user_id, jwt_token, login_time):
             "login_time": login_time
         }).execute()
 
-
-def cleanup_expired_sessions():
+def delete_team_session(team_id):
     db = get_db_connection()
-    expire_time = (datetime.utcnow() - timedelta(hours=1)).isoformat()
-    db.table("team_sessions").delete().lt("login_time", expire_time).execute()
+    db.table("team_sessions").delete().eq("team_id", team_id).execute()
+
