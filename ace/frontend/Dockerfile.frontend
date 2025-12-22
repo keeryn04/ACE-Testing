@@ -1,19 +1,11 @@
 FROM node:20-alpine
 
 WORKDIR /app
-
-# Copy package.json + lock
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci
 
-# Copy source code
-COPY . .
+# We’ll mount the rest of the source in compose for hot reload
+EXPOSE 5173
 
-# Build Vite frontend
-RUN npm run build
-
-# Install static file server
-RUN npm install -g serve
-
-EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Ensure Vite binds to 0.0.0.0 so your browser can hit it
+CMD ["npm", "run", "dev", "--", "--host"]

@@ -16,11 +16,25 @@ def strip_markdown(text: str) -> str:
     return text.strip()
 
 def format_timestamp(ts: str):
+    if not ts:
+        return "Unknown time"
+
+    # Try ISO format
     try:
         dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
         return dt.strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
-        return ts or ""
+        pass
+
+    # Try parsing typical SQL timestamp: "2025-02-14 18:32:11"
+    try:
+        dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        pass
+
+    # If all fails, show raw string (so at least something appears)
+    return ts
 
 class ConversationPDF(FPDF):
     def header(self):
@@ -48,7 +62,7 @@ def export_conversation_to_pdf(messages, out_path, title="Conversation Export"):
     for m in messages:
         role = m.get("role") or m.get("sender") or "user"
         text = m.get("content") if "content" in m else m.get("message_text", "")
-        ts = format_timestamp(m.get("timestamp", ""))
+        ts = format_timestamp(m.get("timestamp") or m.get("created_at") or "")
         sender = "User" if role == "user" else "AI"
 
         # Strip markdown
