@@ -11,9 +11,10 @@ from routes.auth_routes import auth_bp
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
+FRONTEND_URL = os.getenv("VITE_FRONTEND_URL")
 
 app = Flask(__name__)
-CORS(app, origins=["https://ace-testing.onrender.com"], supports_credentials=True)
+CORS(app, origins=[FRONTEND_URL], supports_credentials=True)
 
 app.register_blueprint(personas_bp)
 app.register_blueprint(messages_bp)
