@@ -17,6 +17,15 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* Intro.js skip button */
+.introjs-skipLabel {
+  font-size: 0.75rem;      /* smaller text */
+  padding: 4px 8px;        /* tighter padding */
+  border-radius: 6px;
+  line-height: 1.2;
+  columns: black;
+}
+
 
 a {
   font-weight: 500;
@@ -29,6 +38,7 @@ a:hover {
 
 body {
   margin: 0;
+  padding: 0;
   background: #f1f1f1;
   /*display: flex;*/
   min-width: 320px;

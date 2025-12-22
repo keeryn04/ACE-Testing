@@ -4,6 +4,8 @@ import AboutPage from './pages/AboutPage';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import "intro.js/introjs.css";
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 

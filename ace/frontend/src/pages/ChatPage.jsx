@@ -3,6 +3,7 @@ import "../index.css"
 import HeaderTeal from "../components/header";
 import ReactMarkdown from "react-markdown";
 import PersonaDropup from "../components/dropup"
+import Tutorial from "../components/Tutorial";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -38,11 +39,15 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState("");
 
-  const [personas, setPersonas] = useState([]);
-  const [personaId, setPersonaId] = useState(null); //selected persona id
-
+  const [personas, setPersonas] = useState([]);     // [{id, name}]
+  const [personaId, setPersonaId] = useState(null); // selected persona id
   const [dropupOpen, setDropupOpen] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const currentPersona = personas.find((p) => p.id === personaId) ?? null;
+  const currentPersonaName = currentPersona?.name ?? "—";
+  const currentPersonaRole = currentPersona?.role ?? "";
+  const [runTour, setRunTour] = useState(false);
+  const [tourKey, setTourKey] = useState(0);
   const [userHasTeam, setUserHasTeam] = useState(false);
   const [userId, setUserId] = useState(null);
   const [teamId, setTeamId] = useState(null);
@@ -55,8 +60,10 @@ export default function ChatPage() {
         const res = await fetch(`${API_BASE}/api/personas`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const formatted = data.map((p) => ({ id: p.persona_id, name: p.persona_name }));
+
+        const formatted = data.map((p) => ({ id: p.persona_id, name: p.persona_name, role: p.role}));
         setPersonas(formatted);
+
   
         // Prefer Alex if present; else first
         setPersonaId((prev) => {
@@ -135,11 +142,6 @@ export default function ChatPage() {
         setDownloading(false);
     }
   };
-
-  //Current Persona Name Loading
-  const currentPersonaName =
-    personas.find((p) => p.id === personaId)?.name ?? "—";
-
     useEffect(() => {
       (async () => {
         try {
@@ -263,17 +265,44 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="pt-20 w-full">
-      <HeaderTeal />
-      <div className="text-sm text-gray-600">
+    <div className="w-full h-full">
+      <Tutorial key={tourKey} run={runTour} setRun={setRunTour} />
+      <div className="sticky w-screen left-0 top-0 h-20 bg-darkteal rounded-b-xl border-1 shadow-md z-50">
+        <div className="flex justify-between w-full h-full">
+          <div className="flex flex-col justify-start pl-1 pt-1">
+            <h1 className="app-header font-semibold italic pl-10">ACE</h1>
+            <p className="text-sm pl-10">AI Client for Engineering</p>
+          </div>
+          <div className="flex flex-1 justify-end pr-10 items-center gap-2">
+            <button>Profile</button>
+            <button
+              onClick={() => {
+                setRunTour(false);
+                setTourKey((k) => k + 1);
+                requestAnimationFrame(() => setRunTour(true));
+              }}
+            >Tutorial
+            </button>
+          </div>
+         
+        </div>
+      </div>
+      <div className="current-agent text-sm text-gray-600 text-center pt-4">
         Current agent:{" "}
-        <span className="font-medium text-gray-900">{currentPersonaName}</span>
+        <span className="font-medium text-gray-900">
+          {currentPersonaName}
+        </span>
+        {currentPersonaRole && (
+          <span className="ml-1 text-gray-500">
+            ({currentPersonaRole})
+          </span>
+        )}
       </div>
 
-      {/* Messages container */}
+      {/* Messages / chat area */}
       <div
         ref={scrollRef}
-        className="flex flex-col border-2 my-4 h-[70vh] bg-white overflow-y-auto p-3 w-full rounded-2xl"
+        className="chat-window flex flex-col border-2 my-4  mx-4 h-[70vh] bg-white overflow-y-auto p-3 rounded-2xl"
       >
         {loading && <div className="text-sm text-gray-500">Loading…</div>}
         {err && <div className="text-sm text-red-600">{err}</div>}
@@ -303,7 +332,7 @@ export default function ChatPage() {
       )}
 
       {/*Input field and button */}
-      <div className="flex justify-stretch">
+      <div className="input-area flex justify-stretch pl-5 pr-5">
         <textarea
           className="w-full rounded-md p-3 bg-white border"
           placeholder="Ask a question..."
@@ -324,15 +353,32 @@ export default function ChatPage() {
       {/* Bottom controls */}
       <div className="justify-around flex h-15">
       <div className="relative">
-        <button
-          onClick={() => setDropupOpen((o) => !o)}
-          className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm bg-white hover:bg-gray-50"
+       <button
+        onClick={() => setDropupOpen((o) => !o)}
+        className="change-persona inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm bg-white hover:bg-gray-50"
+      >
+        {currentPersonaName !== "—"
+          ? (
+            <>
+              <span>{currentPersonaName}</span>
+              {currentPersonaRole && (
+                <span className="text-xs text-gray-500">
+                  – {currentPersonaRole}
+                </span>
+              )}
+            </>
+          )
+          : "Change Agent"}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          viewBox="0 0 20 20"
+          fill="currentColor"
         >
-          Change Agent
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4"
-              viewBox="0 0 20 20" fill="currentColor"><path
-            d="M5.23 12.79a.75.75 0 0 0 1.06-.02L10 9.06l3.71 3.71a.75.75 0 0 0 1.06-1.06l-4.24-4.25a.75.75 0 0 0-1.06 0L5.21 11.71a.75.75 0 0 0 .02 1.08z"/></svg>
-        </button>
+        <path d="M5.23 12.79a.75.75 0 0 0 1.06-.02L10 9.06l3.71 3.71a.75.75 0 0 0 1.06-1.06l-4.24-4.25a.75.75 0 0 0-1.06 0L5.21 11.71a.75.75 0 0 0 .02 1.08z" />
+        </svg>
+      </button>
+
 
         <PersonaDropup
           open={dropupOpen}
@@ -342,11 +388,10 @@ export default function ChatPage() {
           onClose={() => setDropupOpen(false)}
         />
         </div>
-        <button>New Chat</button>
         <button
               onClick={handleDownload}
               disabled={downloading}
-              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+              className={`download-pdf inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
                 downloading ? "bg-gray-200 text-gray-500" : "bg-white hover:bg-gray-50"
               }`}
               title="Export this chat as a time-sorted PDF"

@@ -39,13 +39,24 @@ export default function PersonaDropup({ open, personas, selected, onSelect, onCl
                 onSelect(p.id);
                 onClose();
               }}
-              className={`w-full text-left px-3 py-2 hover:bg-gray-100 ${
+              className={`flex w-full items-center justify-between px-3 py-2 hover:bg-gray-100 ${
                 isSelected ? "font-medium text-blue-700" : "text-gray-800"
               }`}
             >
-              {p.name}
-              {p.role}
-              {isSelected && <span className="text-xs opacity-70"> • current</span>}
+              <div className="flex flex-col text-left">
+                <span>{p.name}</span>
+                {p.role && (
+                  <span className="text-xs text-gray-500">
+                    {p.role}
+                  </span>
+                )}
+              </div>
+
+              {isSelected && (
+                <span className="text-xs opacity-70 ml-2">
+                  • current
+                </span>
+              )}
             </button>
           );
         })}
