@@ -35,20 +35,22 @@ def register_user():
         user = get_user_by_id(user_id)
         team_id = user.get("team_id")
         now = datetime.utcnow()
+        exp_time = int((now + timedelta(hours=1)).timestamp())
 
         if team_id:
             #user on team, track 1-hour session
-            session = get_team_session(user_id)
-            if session and now - session.login_time < timedelta(hours=1):
+            session = get_team_session(team_id)
+            if session and now - session["login_time"] < timedelta(hours=1):
                 return jsonify({"error": "Another team member is logged in"}), 403
 
             token = jwt.encode({
                 "current_user": user_id,
                 "team_id": team_id,
-                "exp": now + timedelta(hours=1)
+                "exp": exp_time
             }, SECRET)
 
-            upsert_team_session(team_id, user_id, token, now)
+            login_time = int(now.timestamp())
+            upsert_team_session(team_id, user_id, token, login_time)
 
             return jsonify({"token": token, "requires_team": False}), 201
 
@@ -57,7 +59,7 @@ def register_user():
             token = jwt.encode({
                 "current_user": user_id,
                 "team_id": None,
-                "exp": now + timedelta(hours=1)
+                "exp": exp_time
             }, SECRET)
 
             return jsonify({"token": token, "requires_team": True}), 201
@@ -94,6 +96,7 @@ def login():
         team_id = user.get("team_id")
         now = datetime.utcnow()
         exp_time = int((now + timedelta(hours=1)).timestamp())
+        login_time = int(now.timestamp())
         can_send_messages = True
         
         if team_id:
@@ -108,17 +111,19 @@ def login():
             }, SECRET)
 
             if session:
-                if now - session["login_time"] < timedelta(hours=1):
+                session_login_time = session["login_time"]
+
+                if now - session_login_time < timedelta(hours=1):
                     #Session is still valid
                     if session["current_user_id"] != user.get("user_id"):
                         can_send_messages = False  #Someone else owns it
                     #If it's the same user, can_send_messages stays True
                 else:
                     #Session expired -> allow login to create a new session
-                    upsert_team_session(team_id, user.get("user_id"), token, now)
+                    upsert_team_session(team_id, user.get("user_id"), token, login_time)
             else:
                 #No session exists -> create one
-                upsert_team_session(team_id, user.get("user_id"), token, now)
+                upsert_team_session(team_id, user.get("user_id"), token, login_time)
 
             return jsonify({
                 "token": token,
