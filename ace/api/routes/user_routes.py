@@ -36,6 +36,7 @@ def register_user():
         team_id = user.get("team_id")
         now = datetime.utcnow()
         exp_time = int((now + timedelta(hours=1)).timestamp())
+        login_time = now.isoformat()
 
         if team_id:
             #user on team, track 1-hour session
@@ -49,7 +50,6 @@ def register_user():
                 "exp": exp_time
             }, SECRET)
 
-            login_time = int(now.timestamp())
             upsert_team_session(team_id, user_id, token, login_time)
 
             return jsonify({"token": token, "requires_team": False}), 201
@@ -96,7 +96,7 @@ def login():
         team_id = user.get("team_id")
         now = datetime.utcnow()
         exp_time = int((now + timedelta(hours=1)).timestamp())
-        login_time = int(now.timestamp())
+        login_time = now.isoformat()
         can_send_messages = True
         
         if team_id:
