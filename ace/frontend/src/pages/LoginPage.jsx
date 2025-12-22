@@ -53,7 +53,7 @@ const LoginPage = () => {
         <div className="pt-20 w-full">
             <HeaderTeal />
                 <div>
-                    <h1 className='text-5xl font-bold'>Login Page</h1>
+                    <h1 className='text-5xl text-center font-bold'>Login Page</h1>
                     <div className="flex flex-col justify-center items-center w-full h-100 bg-darkteal rounded-3xl shadow-lg space-y-3">
                         <input className="h-10 w-50 rounded-md justify-center flex items-center p-4 bg-white"
                             type="email"

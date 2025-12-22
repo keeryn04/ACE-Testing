@@ -344,7 +344,7 @@ export default function ChatPage() {
         />
         <button onClick={sendMessage}
          disabled={!userHasTeam || !canSendMessages  || sending || !userMessage.trim()}
-         className={`px-4 py-2 rounded text-black ${sending ? "bg-white-400" : "bg-blue-600"}`}
+         className={`send-message px-4 py-2 rounded text-black ${sending ? "bg-white-400" : "bg-blue-600"}`}
         >
           {sending ? "Sending…" : "Send"}
         </button>                        
@@ -391,7 +391,7 @@ export default function ChatPage() {
         <button
               onClick={handleDownload}
               disabled={downloading}
-              className={`download-pdf inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+              className={`download-pdf inline-flex items-center h-4 gap-2 rounded-lg border px-3 py-2 text-sm ${
                 downloading ? "bg-gray-200 text-gray-500" : "bg-white hover:bg-gray-50"
               }`}
               title="Export this chat as a time-sorted PDF"
