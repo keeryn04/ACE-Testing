@@ -7,7 +7,7 @@ def get_past_messages(team_id, persona_id):
           .select("sender_type, content, timestamp, persona_id")
           .eq("team_id", team_id)
           .eq("persona_id", persona_id)
-          .order("timestamp", ascending="asc")
+          .order("column_name", desc=True)
           .execute()
     )
 
