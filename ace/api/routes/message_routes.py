@@ -14,14 +14,12 @@ messages_bp = Blueprint("messages", __name__)
 def past_messages():
     team_id = request.args.get("team_id")
     persona_name = request.args.get("persona_name")
-    print(team_id)
 
     if not team_id or not persona_name:
         return jsonify({"error": "Missing parameters"}), 400
 
     #Fetch persona
     persona = get_persona_by_name(persona_name)
-    print(persona)
     persona_id = persona["persona_id"] if persona else None
 
     #Fetch past messages
@@ -73,7 +71,7 @@ def send_message():
             history=history,
             user_message=user_message
         )
-        ai_text = "true twin" #call_openai_chat(messages)
+        ai_text = call_openai_chat(messages)
 
         #Save user, AI messages
         insert_message(team_id, persona_id=persona_id, sender_type="user", content=user_message)
