@@ -14,12 +14,14 @@ messages_bp = Blueprint("messages", __name__)
 def past_messages():
     team_id = request.args.get("team_id")
     persona_name = request.args.get("persona_name")
+    print(team_id)
 
     if not team_id or not persona_name:
         return jsonify({"error": "Missing parameters"}), 400
 
     #Fetch persona
     persona = get_persona_by_name(persona_name)
+    print(persona)
     persona_id = persona["persona_id"] if persona else None
 
     #Fetch past messages
