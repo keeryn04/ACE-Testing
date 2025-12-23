@@ -37,9 +37,9 @@ def get_user_by_id(user_id):
     response = db.table("user").select("*").eq("user_id", user_id).limit(1).execute()
     return response.data[0] if response.data else None
 
-def get_user_by_email(email):
+def get_user_by_username(username):
     db = get_db_connection()
-    response = db.table("user").select("*").eq("email", email).limit(1).execute()
+    response = db.table("user").select("*").eq("username", username).limit(1).execute()
     return response.data[0] if response.data else None
 
 def hash_password(plain_password: str) -> str:
@@ -66,10 +66,6 @@ def get_teams_with_members():
     db = get_db_connection()
     teams_response = db.table("team").select("team_id, name, created_at").execute()
     teams = teams_response.data or []
-
-    for team in teams:
-        members_response = db.table("user").select("user_id, name").eq("team_id", team["team_id"]).execute()
-        team["members"] = members_response.data or []
 
     return teams
 

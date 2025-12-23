@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 import jwt
-from helpers.user_helpers import add_user_to_team, check_user_password, get_team, get_team_session, get_teams_with_members, get_user_by_email, get_user_by_id, register_new_user, get_all_users, upsert_team_session, delete_team_session
+from helpers.user_helpers import add_user_to_team, check_user_password, get_team, get_team_session, get_teams_with_members, get_user_by_id, get_user_by_username, register_new_user, get_all_users, upsert_team_session, delete_team_session
 
 load_dotenv()
 SECRET = os.getenv("JWT_ACCESS_KEY")
@@ -78,17 +78,17 @@ def register_user():
 def login():
     try:
         data = request.json
-        email = data.get("email")
+        username = data.get("username")
         password = data.get("password")
 
-        if not email:
-                return jsonify({"error": "Email is required"}), 400
+        if not username:
+                return jsonify({"error": "Username is required"}), 400
 
         if not password:
             return jsonify({"error": "Password is required"}), 400
 
         #User lookup
-        user = get_user_by_email(email)
+        user = get_user_by_username(username)
         if not user:
             return jsonify({"error": "User not found"}), 404
 
