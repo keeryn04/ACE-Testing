@@ -15,8 +15,8 @@ def past_messages():
     team_id = request.args.get("team_id")
     persona_name = request.args.get("persona_name")
 
-    if not team_id or not persona_name:
-        return jsonify({"error": "Missing parameters"}), 400
+    if not persona_name:
+        return jsonify({"error": "Missing persona name"}), 400
 
     #Fetch persona
     persona = get_persona_by_name(persona_name)
