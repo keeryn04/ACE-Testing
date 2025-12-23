@@ -12,6 +12,7 @@ const HeaderTeal = () => {
   const dropdownRef = useRef(null);
 
   const handleProfileClick = () => {
+    console.log("Profile clicked", !showTeamDropdown);
     setShowTeamDropdown((prev) => !prev);  //Dropdown for profile
   };
 
@@ -62,7 +63,7 @@ const HeaderTeal = () => {
           <div className="relative" ref={dropdownRef}>
             <button onClick={handleProfileClick}>Profile</button>
             {showTeamDropdown && (
-              <div className="absolute right-0 mt-2 z-50">
+              <div className="absolute right-0 mt-2 z-50 bg-black border">
                 <TeamDropdown />
               </div>
             )}

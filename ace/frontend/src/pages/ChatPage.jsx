@@ -322,7 +322,7 @@ export default function ChatPage() {
       {/* Error / info message */}
       {!userHasTeam && (
         <div className="text-red-600 mb-2">
-          Join a team before chatting.
+          Join a team in Profile before chatting.
         </div>
       )}
       {userHasTeam && !canSendMessages && (
