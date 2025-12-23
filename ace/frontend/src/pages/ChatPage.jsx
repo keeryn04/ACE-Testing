@@ -269,6 +269,9 @@ export default function ChatPage() {
       <Tutorial key={tourKey} run={runTour} setRun={setRunTour} />
 
       <HeaderTeal
+        showProfile
+        showLogout
+        showTutorial
         onTutorial={() => {
           setRunTour(false);
           setTourKey((k) => k + 1);

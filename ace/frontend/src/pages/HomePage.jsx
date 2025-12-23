@@ -14,7 +14,7 @@ const HomePage = () => {
 
     return(
         <div className="pt-20">
-            < HeaderTeal />
+            <HeaderTeal />
                 <div className="w-full flex flex-col border-2 items-center justify-center">
                     <h1 className='text-5xl font-bold'>Welcome to ACE!</h1>
                     <div    className="flex flex-col justify-center items-center w-full h-100 bg-darkteal rounded-3xl shadow-lg space-y-3">

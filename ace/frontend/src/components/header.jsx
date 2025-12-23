@@ -6,7 +6,12 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-const HeaderTeal = ({ onTutorial }) => {
+const HeaderTeal = ({
+  showTutorial = false,
+  showProfile = false,
+  showLogout = false,
+  onTutorial,
+}) => {
   const navigate = useNavigate();
   const [showTeamDropdown, setShowTeamDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -50,23 +55,27 @@ const HeaderTeal = ({ onTutorial }) => {
         </div>
 
         <div className="flex flex-1 justify-end pr-10 items-center gap-2">
-          <div className="relative" ref={dropdownRef}>
-            <button onClick={handleProfileClick}>Profile</button>
-            {showTeamDropdown && (
-              <div className="absolute right-0 mt-2 z-50 bg-white border rounded shadow">
-                <TeamDropdown />
-              </div>
-            )}
-          </div>
+          {showProfile && (
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={handleProfileClick}>Profile</button>
+              {showTeamDropdown && (
+                <div className="absolute right-0 mt-2 z-50 bg-white border rounded shadow">
+                  <TeamDropdown />
+                </div>
+              )}
+            </div>
+          )}
 
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-3 py-1 rounded"
-          >
-            Logout
-          </button>
+          {showLogout && (
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 text-white px-3 py-1 rounded"
+            >
+              Logout
+            </button>
+          )}
 
-          {onTutorial && (
+          {showTutorial && onTutorial && (
             <button onClick={onTutorial}>
               Tutorial
             </button>
