@@ -1,6 +1,10 @@
 from database import get_db_connection
 
 def get_past_messages(team_id, persona_id):
+    #User is not on a team yet, no messages
+    if not team_id or not persona_id:
+        return []
+
     db = get_db_connection()
     response = (
         db.table("messages")
@@ -16,7 +20,7 @@ def get_past_messages(team_id, persona_id):
         {
             "role": "assistant" if m["sender_type"] == "ai" else "user",
             "content": m["content"],
-            "timestamp": m["timestamp"] if m["timestamp"] else None,
+            "timestamp": m["timestamp"],
         }
         for m in rows
     ]
