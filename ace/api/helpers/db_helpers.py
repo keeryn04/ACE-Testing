@@ -2,7 +2,7 @@ from database import get_db_connection
 
 def get_past_messages(team_id, persona_id):
     #User is not on a team yet, no messages
-    if not team_id or not persona_id:
+    if not team_id or team_id == "null" or not persona_id:
         return []
 
     db = get_db_connection()
