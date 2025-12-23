@@ -8,6 +8,11 @@ export default function TeamDropdown() {
   const [allTeams, setAllTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
+  const [teamPassword, setTeamPassword] = useState("");
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState("");
 
   const fetchUserAndTeams = async () => {
     const token = localStorage.getItem("token");
@@ -46,29 +51,51 @@ export default function TeamDropdown() {
     fetchUserAndTeams();
   }, []);
 
-  const handleJoinTeam = async (teamId) => {
-    const teamPassword = prompt("Enter team password:");
-    if (!teamPassword) return;
+  const handleJoinTeam = (teamId) => {
+    setSelectedTeamId(teamId);
+    setTeamPassword("");
+    setJoinError("");
+    setShowJoinModal(true);
+  };
+
+  const submitJoinTeam = async () => {
+    if (!teamPassword.trim()) {
+      setJoinError("Team password is required");
+      return;
+    }
 
     const token = localStorage.getItem("token");
+    if (!token) return;
+
     try {
-      const res = await fetch(`${API_BASE}/api/join_team/${teamId}`, {
+      setJoining(true);
+      setJoinError("");
+
+      const res = await fetch(`${API_BASE}/api/join_team/${selectedTeamId}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ team_password: teamPassword })
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ team_password: teamPassword }),
       });
+
       const data = await res.json();
-      if (res.ok) {
-        setUserTeam(allTeams.find((t) => t.team_id === teamId));
-        localStorage.setItem("requiresTeam", false);
-        alert("Successfully joined team! Please login.");
-        navigate("/"); //need to log back in to reset team logic
-      } else {
-        alert(data.error || "Failed to join team");
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to join team");
       }
+
+      setUserTeam(allTeams.find((t) => t.team_id === selectedTeamId));
+      localStorage.setItem("requiresTeam", false);
+
+      setShowJoinModal(false);
+      alert("Successfully joined team! Please login.");
+      navigate("/");
     } catch (err) {
-      console.error("Join team error:", err);
-      alert("Failed to join team");
+      setJoinError(err.message);
+    } finally {
+      setJoining(false);
     }
   };
 
@@ -115,6 +142,49 @@ export default function TeamDropdown() {
               <li>No teams found</li>
             )}
           </ul>
+          {showJoinModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
+                <h2 className="text-lg font-semibold mb-2">Join Team</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  Enter the password to join this team.
+                </p>
+
+                <input
+                  type="password"
+                  value={teamPassword}
+                  onChange={(e) => setTeamPassword(e.target.value)}
+                  className="w-full border rounded px-3 py-2 mb-2"
+                  placeholder="Team password"
+                  autoFocus
+                />
+
+                {joinError && (
+                  <div className="text-sm text-red-600 mb-2">
+                    {joinError}
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 mt-4">
+                  <button
+                    onClick={() => setShowJoinModal(false)}
+                    className="px-3 py-1 rounded border"
+                    disabled={joining}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={submitJoinTeam}
+                    disabled={joining}
+                    className="px-4 py-1 rounded bg-teal-600 text-white disabled:opacity-60"
+                  >
+                    {joining ? "Joining…" : "Join"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
