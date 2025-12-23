@@ -267,26 +267,15 @@ export default function ChatPage() {
   return (
     <div className="w-full h-full">
       <Tutorial key={tourKey} run={runTour} setRun={setRunTour} />
-      <div className="sticky w-screen left-0 top-0 h-20 bg-darkteal rounded-b-xl border-1 shadow-md z-50">
-        <div className="flex justify-between w-full h-full">
-          <div className="flex flex-col justify-start pl-1 pt-1">
-            <h1 className="app-header font-semibold italic pl-10">ACE</h1>
-            <p className="text-sm pl-10">AI Client for Engineering</p>
-          </div>
-          <div className="flex flex-1 justify-end pr-10 items-center gap-2">
-            <button>Profile</button>
-            <button
-              onClick={() => {
-                setRunTour(false);
-                setTourKey((k) => k + 1);
-                requestAnimationFrame(() => setRunTour(true));
-              }}
-            >Tutorial
-            </button>
-          </div>
-         
-        </div>
-      </div>
+
+      <HeaderTeal
+        onTutorial={() => {
+          setRunTour(false);
+          setTourKey((k) => k + 1);
+          requestAnimationFrame(() => setRunTour(true));
+        }}
+      />
+
       <div className="current-agent text-sm text-gray-600 text-center pt-4">
         Current agent:{" "}
         <span className="font-medium text-gray-900">
