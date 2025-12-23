@@ -50,11 +50,10 @@ export default function TeamDropdown() {
     const teamPassword = prompt("Enter team password:");
     if (!teamPassword) return;
 
-    const token = localStorage.getItem("token");
     try {
       const res = await fetch(`${API_BASE}/api/join_team/${teamId}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ team_password: teamPassword })
       });
       const data = await res.json();
