@@ -1,6 +1,5 @@
 import './App.css';
 import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -17,7 +16,6 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/chat" element={<ChatPage />} />
-        <Route path="/about" element={<AboutPage />} />
       </Routes>
     </Router>
   );
