@@ -172,11 +172,18 @@ def logout():
         user_id = payload.get("current_user")
         team_id = payload.get("team_id")
 
-        #Clear team session if user is part of a team
+        if not user_id:
+            return jsonify({"error": "Invalid token"}), 401
+
+        # Only clear the team session if THIS user owns it
         if team_id:
-            delete_team_session(team_id)
+            active_session = get_team_session(team_id)
+
+            if active_session and active_session.user_id == user_id:
+                delete_team_session(team_id)
 
         return jsonify({"success": True}), 200
+
     except Exception as e:
         print("Logout error:", e)
         return jsonify({"error": "Failed to logout"}), 500
