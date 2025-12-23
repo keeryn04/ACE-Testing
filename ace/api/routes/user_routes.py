@@ -17,16 +17,14 @@ user_bp = Blueprint("user", __name__)
 def register_user():
     data = request.get_json() or {}
 
-    name = data.get("name")
-    email = data.get("email")
+    username = data.get("username")
     password = data.get("password")
-    ucid = data.get("ucid")
 
-    if not all([name, email, password, ucid]):
+    if not all([username, password]):
         return jsonify({"success": False, "error": "missing_fields"}), 400
 
     try:
-        success, error, user_id = register_new_user(name, email, password, ucid)
+        success, error, user_id = register_new_user(username, password)
         if not success:
             if error == "user_exists":
                 return jsonify({"success": False, "error": error}), 409

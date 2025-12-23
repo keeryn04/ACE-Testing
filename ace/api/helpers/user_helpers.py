@@ -5,11 +5,11 @@ from database import get_db_connection
 
 MAX_MEMBERS = 5
 
-def register_new_user(name, email, password, ucid):
+def register_new_user(username, password):
     db = get_db_connection()
 
     #Check if user exists
-    response = db.table("user").select("email, ucid").or_(f"ucid.eq.{ucid},email.eq.{email}").limit(1).execute()
+    response = db.table("user").select("username").or_(f"username.eq.{username}").limit(1).execute()
     if response.data:
         return False, "user_exists", None
     
@@ -19,11 +19,8 @@ def register_new_user(name, email, password, ucid):
     new_user_id = str(uuid.uuid4())
     response = db.table("user").insert({
         "user_id": new_user_id,
-        "name": name,
-        "email": email,
+        "username": username,
         "password": password_hash,
-        "ucid": ucid,
-        "is_prof": False
     }).execute()
 
     if response.data:
