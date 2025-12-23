@@ -7,7 +7,7 @@ import HeaderTeal from "../components/header";
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 const LoginPage = () => {
-    const [email, setEmail] = useState("");  
+    const [username, setUsername] = useState("");  
     const [password, setPassword] = useState("");  
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate(); 
@@ -15,7 +15,7 @@ const LoginPage = () => {
     const handleSubmit = async () => {
         setErrorMessage("");
 
-        if (!email || !password) {
+        if (!username || !password) {
             alert("Please fill in both fields.");
             return;
         }
@@ -24,7 +24,7 @@ const LoginPage = () => {
             const response = await fetch(`${API_BASE}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ username, password }),
             });
 
             const data = await response.json();
@@ -56,10 +56,10 @@ const LoginPage = () => {
                     <h1 className='text-5xl text-center font-bold'>Login Page</h1>
                     <div className="flex flex-col justify-center items-center w-full h-100 bg-darkteal rounded-3xl shadow-lg space-y-3">
                         <input className="h-10 w-50 rounded-md justify-center flex items-center p-4 bg-white"
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}  // Update email state
+                            type="username"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}  // Update username state
                             />
                         <input className="h-10 w-50 rounded-md justify-center flex items-center p-4 bg-white"
                             type="password"
